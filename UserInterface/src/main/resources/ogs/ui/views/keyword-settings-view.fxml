@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+<?import javafx.scene.control.cell.TextFieldTableCell?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      spacing="10" style="-fx-padding: 10;">
+
+    <Label text="Keywords Settings" style="-fx-font-weight: bold; -fx-font-size: 16;" />
+
+    <TableView fx:id="keywordsTable" prefHeight="400" prefWidth="600" editable="true">
+        <columns>
+            <!-- Keyword Column -->
+            <TableColumn fx:id="keywordColumn" text="Keyword">
+                <cellValueFactory>
+                    <PropertyValueFactory property="keyword" />
+                </cellValueFactory>
+                <cellFactory>
+                    <TextFieldTableCell fx:factory="forTableColumn" />
+                </cellFactory>
+            </TableColumn>
+
+            <!-- Mapped Concept Column (ComboBox for TableAnalysisConcept) -->
+            <TableColumn fx:id="conceptColumn" text="Concept">
+                <cellValueFactory>
+                    <PropertyValueFactory property="concept" />
+                </cellValueFactory>
+            </TableColumn>
+
+            <!-- Complete Match Checkbox Column -->
+            <TableColumn fx:id="completeMatchColumn" text="Complete Match">
+                <cellValueFactory>
+                    <PropertyValueFactory property="completeMatch" />
+                </cellValueFactory>
+            </TableColumn>
+
+            <!-- Case Sensitive Checkbox Column -->
+            <TableColumn fx:id="caseSensitiveColumn" text="Case Sensitive">
+                <cellValueFactory>
+                    <PropertyValueFactory property="caseSensitive" />
+                </cellValueFactory>
+            </TableColumn>
+        </columns>
+    </TableView>
+
+    <!-- Add Button  -->
+    <HBox alignment="CENTER_LEFT">
+        <Button text="+ Add" onAction="#onAddKeyword" />
+    </HBox>
+</VBox>

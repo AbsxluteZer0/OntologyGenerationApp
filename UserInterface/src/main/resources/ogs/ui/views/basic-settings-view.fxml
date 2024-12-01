@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            spacing="10" style="-fx-padding: 10;">
+
+    <Label text="Basic Settings" style="-fx-font-weight: bold; -fx-font-size: 16;" />
+
+    <!-- Source File Path -->
+    <VBox>
+        <Label text="Source File Path:" />
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <TextField fx:id="sourceFilePathField" prefWidth="300" />
+            <Button text="Open" onAction="#openSourceFile" />
+        </HBox>
+    </VBox>
+
+    <!-- Localization Dictionary File Path -->
+    <VBox>
+        <Label text="Localization Dictionary File Path:" />
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <TextField fx:id="localizationDictionaryFilePathField" prefWidth="300" />
+            <Button text="Open" onAction="#openLocalizationDictionaryFile" />
+        </HBox>
+    </VBox>
+
+    <!-- Output Directory -->
+    <VBox>
+        <Label text="Output Directory:" />
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <TextField fx:id="outputDirectoryField" prefWidth="300" />
+            <Button text="Open" onAction="#openOutputDirectory" />
+        </HBox>
+    </VBox>
+
+    <!-- Ontology File Name -->
+    <VBox alignment="CENTER_LEFT">
+        <Label text="Ontology File Name:" />
+        <TextField fx:id="ontologyFileNameField" prefWidth="300" />
+    </VBox>
+
+    <!-- Sheet ID -->
+    <VBox alignment="CENTER_LEFT">
+        <Label text="Sheet ID:" />
+        <TextField fx:id="sheetIdField" prefWidth="100" />
+    </VBox>
+
+    <!-- Hierarchy Level Indicator -->
+    <VBox alignment="CENTER_LEFT">
+        <Label text="Hierarchy Level Indicator:" />
+        <TextField fx:id="hierarchyLevelIndicatorField" prefWidth="300" />
+    </VBox>
+
+    <!-- Data Cleansing Regex -->
+    <VBox alignment="CENTER_LEFT">
+        <Label text="Data Cleansing Regex:" />
+        <TextField fx:id="dataCleansingRegex" prefWidth="300" />
+    </VBox>
+</VBox>

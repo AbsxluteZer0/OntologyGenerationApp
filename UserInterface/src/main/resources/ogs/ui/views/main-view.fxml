@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.Pane?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="ogs.ui.controllers.MainController">
+
+    <!-- Left-side section panel -->
+    <left>
+        <SplitPane orientation="VERTICAL" style="-fx-background-color: #f0f0f0;">
+            <VBox spacing="10" style="-fx-padding: 10;">
+                <Label text="Settings" style="-fx-font-weight: bold; -fx-font-size: 16;" />
+                <Button text="Basic Settings" onAction="#handleBasicTab"
+                        VBox.vgrow="NEVER" maxWidth="Infinity" style="-fx-alignment: CENTER_LEFT;" />
+                <Button text="Keywords Settings" onAction="#handleKeywordsTab"
+                        VBox.vgrow="NEVER" maxWidth="Infinity" style="-fx-alignment: CENTER_LEFT;"/>
+            </VBox>
+        </SplitPane>
+    </left>
+
+    <!-- Vertical Split Pane -->
+    <center>
+        <Pane fx:id="currentView" />
+    </center>
+
+    <!-- Control buttons -->
+    <bottom>
+        <HBox alignment="CENTER_RIGHT" spacing="10" style="-fx-padding: 10; -fx-background-color: #f0f0f0;">
+            <Label fx:id="messageLabel" />
+            <Button text="Save" onAction="#handleSave" />
+            <Button text="Run" onAction="#handleRun" />
+            <Button text="Save and Run" onAction="#handleSaveAndRun" fx:id="saveAndRunButton"/>
+        </HBox>
+    </bottom>
+</BorderPane>
+
+

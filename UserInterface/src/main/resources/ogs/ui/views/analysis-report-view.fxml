@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            style="-fx-padding: 10;">
+
+    <!-- Grid Surrounding the Column -->
+    <center>
+        <StackPane>
+            <GridPane style="-fx-border-color: lightgray; -fx-border-width: 0 1 1 0;" hgap="2" vgap="2">
+                <!-- Top Header (Column Index as a Capital Letter) -->
+                <Label text="A" style="-fx-font-weight: bold; -fx-alignment: center;" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+
+                <!-- Left Index Labels -->
+                <Label text="1" style="-fx-font-weight: bold; -fx-alignment: center;" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+                <Label text="2" style="-fx-font-weight: bold; -fx-alignment: center;" GridPane.rowIndex="2" GridPane.columnIndex="0" />
+                <Label text="3" style="-fx-font-weight: bold; -fx-alignment: center;" GridPane.rowIndex="3" GridPane.columnIndex="0" />
+                <Label text="4" style="-fx-font-weight: bold; -fx-alignment: center;" GridPane.rowIndex="4" GridPane.columnIndex="0" />
+                <Label text="5" style="-fx-font-weight: bold; -fx-alignment: center;" GridPane.rowIndex="5" GridPane.columnIndex="0" />
+                <Label text="6" style="-fx-font-weight: bold; -fx-alignment: center;" GridPane.rowIndex="6" GridPane.columnIndex="0" />
+                <Label text="7" style="-fx-font-weight: bold; -fx-alignment: center;" GridPane.rowIndex="7" GridPane.columnIndex="0" />
+                <Label text="8" style="-fx-font-weight: bold; -fx-alignment: center;" GridPane.rowIndex="8" GridPane.columnIndex="0" />
+                <Label text="9" style="-fx-font-weight: bold; -fx-alignment: center;" GridPane.rowIndex="9" GridPane.columnIndex="0" />
+                <Label text="10" style="-fx-font-weight: bold; -fx-alignment: center;" GridPane.rowIndex="10" GridPane.columnIndex="0" />
+
+                <!-- Column Header -->
+                <Label text="Column Header" style="-fx-font-weight: bold; -fx-font-size: 14; -fx-alignment: center;"
+                       GridPane.rowIndex="1" GridPane.columnIndex="1" GridPane.rowSpan="1" />
+
+                <!-- Column Data -->
+                <Label text="Element 1" GridPane.rowIndex="2" GridPane.columnIndex="1" />
+                <Label text="Element 2" GridPane.rowIndex="3" GridPane.columnIndex="1" />
+                <Label text="Element 3" GridPane.rowIndex="4" GridPane.columnIndex="1" />
+                <Label text="Element 4" GridPane.rowIndex="5" GridPane.columnIndex="1" />
+                <Label text="Element 5" GridPane.rowIndex="6" GridPane.columnIndex="1" />
+                <Label text="Element 6" GridPane.rowIndex="7" GridPane.columnIndex="1" />
+                <Label text="Element 7" GridPane.rowIndex="8" GridPane.columnIndex="1" />
+                <Label text="Element 8" GridPane.rowIndex="9" GridPane.columnIndex="1" />
+                <Label text="Element 9" GridPane.rowIndex="10" GridPane.columnIndex="1" />
+                <Label text="Element 10" GridPane.rowIndex="11" GridPane.columnIndex="1" />
+            </GridPane>
+        </StackPane>
+    </center>
+
+    <!-- Control Panel Below the Grid -->
+    <bottom>
+        <HBox spacing="10" alignment="center" style="-fx-padding: 10;">
+            <Button text="◀" fx:id="prevButton" />
+            <Label text="1 of 5" fx:id="idIndicator" style="-fx-font-weight: bold;" />
+            <Button text="▶" fx:id="nextButton" />
+        </HBox>
+    </bottom>
+</BorderPane>
