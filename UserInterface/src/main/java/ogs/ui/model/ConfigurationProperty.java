@@ -1,6 +1,5 @@
 package ogs.ui.model;
 
-import javafx.application.Platform;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -87,21 +86,17 @@ public class ConfigurationProperty {
 
     private void attachListenersToEntry(KeywordEntry entry) {
 
-        entry.getKeywordProperty().addListener((obs, oldVal, newVal) -> {
-            updateKeywordValueInConfig(oldVal, entry);
-        });
+        entry.getKeywordProperty().addListener((obs, oldVal, newVal)
+                -> updateKeywordValueInConfig(oldVal, entry));
 
-        entry.getConceptProperty().addListener((obs, oldVal, newVal) -> {
-            addOrUpdateKeywordInConfig(entry);
-        });
+        entry.getConceptProperty().addListener((obs, oldVal, newVal)
+                -> addOrUpdateKeywordInConfig(entry));
 
-        entry.getCompleteMatchProperty().addListener((obs, oldVal, newVal) -> {
-            addOrUpdateKeywordInConfig(entry);
-        });
+        entry.getCompleteMatchProperty().addListener((obs, oldVal, newVal)
+                -> addOrUpdateKeywordInConfig(entry));
 
-        entry.getCaseSensitiveProperty().addListener((obs, oldVal, newVal) -> {
-            addOrUpdateKeywordInConfig(entry);
-        });
+        entry.getCaseSensitiveProperty().addListener((obs, oldVal, newVal)
+                -> addOrUpdateKeywordInConfig(entry));
     }
 
     private void addOrUpdateKeywordInConfig(KeywordEntry entry) {
