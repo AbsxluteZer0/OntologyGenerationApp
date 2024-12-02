@@ -34,6 +34,7 @@ import java.util.*;
 public class MainController {
 
     private final String configFilePath;
+    private final String defaultConfigFilePath;
     private ConfigurationProperty configProperty;
     private UserNotificationService notificationService;
 
@@ -47,12 +48,13 @@ public class MainController {
     @FXML public Label messageLabel;
     @FXML public Button saveAndRunButton;
 
-    public static Object createInstance(String configFilePath) {
-        return new MainController(configFilePath);
+    public static Object createInstance(String configFilePath, String defaultConfigFilePath) {
+        return new MainController(configFilePath, defaultConfigFilePath);
     }
 
-    public MainController(String configFilePath) {
+    public MainController(String configFilePath, String defaultConfigFilePath) {
         this.configFilePath = configFilePath;
+        this.defaultConfigFilePath = defaultConfigFilePath;
     }
 
     public void initialize() {
@@ -127,22 +129,29 @@ public class MainController {
     }
 
     private Configuration deserializeConfig(String filePath) {
-
         ObjectMapper objectMapper = new ObjectMapper();
         File configFile = new File(filePath);
 
         try {
             if (!configFile.exists()) {
-                notificationService.info("Configuration file is missing.");
-                return new Configuration();
-
+                notificationService.info("Configuration file is missing. Loading default configuration...");
+                if (!new File(defaultConfigFilePath).exists()) {
+                    notificationService.info("Default configuration file is missing");
+                    notificationService.warning("Default configuration file is missing. " +
+                            "Make sure '" + defaultConfigFilePath +
+                            "' file is present in the root directory to avoid this message in the future.");
+                    return new Configuration();
+                }
+                return deserializeConfig(defaultConfigFilePath);
             } else if (configFile.length() == 0) {
-                notificationService.info("Configuration file is empty.");
+                notificationService.info("Configuration file is empty");
                 return new Configuration();
             }
+
             return objectMapper.readValue(configFile, Configuration.class);
+
         } catch (IOException e) {
-            notificationService.error(
+            notificationService.warning(
                     "Failed to deserialize the configuration! The file will be overwritten on 'Save'.", e);
             return new Configuration();
         }
