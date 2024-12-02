@@ -132,14 +132,18 @@ public class MainController {
         File configFile = new File(filePath);
 
         try {
-            if (configFile.length() == 0) {
+            if (!configFile.exists()) {
+                notificationService.info("Configuration file is missing.");
+                return new Configuration();
+
+            } else if (configFile.length() == 0) {
                 notificationService.info("Configuration file is empty.");
                 return new Configuration();
             }
             return objectMapper.readValue(configFile, Configuration.class);
-
         } catch (IOException e) {
-            notificationService.warning("Failed to deserialize the configuration!", e);
+            notificationService.error(
+                    "Failed to deserialize the configuration! The file will be overwritten on 'Save'.", e);
             return new Configuration();
         }
     }
@@ -149,25 +153,11 @@ public class MainController {
         notificationService.info("Saving...");
 
         File configFile = new File(configFilePath);
-        boolean isNewFileCreated = false;
-
-        if (!configFile.exists()) {
-            try {
-                isNewFileCreated = configFile.createNewFile();
-            } catch (IOException e) {
-                notificationService.error("Failed to create the configuration file!", e);
-                return; // Exit if the file couldn't be created
-            }
-        }
-
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 
         try {
             objectMapper.writeValue(configFile, configProperty.getConfiguration());
-            if (isNewFileCreated) {
-                notificationService.info("A new configuration file was created.");
-            }
             notificationService.info("Saved successfully");
         } catch (IOException e) {
             notificationService.error("Failed to serialize the configuration!", e);
