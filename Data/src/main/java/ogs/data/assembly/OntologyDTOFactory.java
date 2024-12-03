@@ -143,20 +143,18 @@ public class OntologyDTOFactory {
 
         List<IndividualDTO> individuals = new ArrayList<>();
 
-        String[] identifierValues = Arrays.stream(
-                columnsToBuild.get(concept)
-                        .getFirst()
-                        .getColumnData())
-                .filter(Objects::nonNull)
-                .map(CellValue::toString)
-                .toArray(String[]::new);
+        CellValue[] identifierValues = columnsToBuild.get(concept)
+                .getFirst()
+                .getColumnData();
 
-        for (String identifierValue : identifierValues) {
-            individuals.add(new IndividualDTO(identifierValue, identifierValue)); // labeling with id in case there are no labels
-        }
+        Arrays.stream(identifierValues)
+                .filter(Objects::nonNull)
+                .forEach(cellValue -> individuals.add(
+                        IndividualDTOFactory.createIndividual(cellValue)));
 
         return individuals;
     }
+
 
     private void setLabels(List<IndividualDTO> individuals) {
 
@@ -261,91 +259,18 @@ public class OntologyDTOFactory {
             return;
 
         for (ColumnAnalyzer dataPropertyColumn : columnsToBuild.get(DataPropertyColumn)) {
-
-            Class<?> type = Object.class;
-
-            if (Arrays.stream(dataPropertyColumn.getColumnData())
-                    .filter(Objects::nonNull)
-                    .allMatch(cellValue ->
-                            cellValue.getType() == CellType.NUMERIC)) {
-
-                    if (Arrays.stream(dataPropertyColumn.getColumnData())
-                            .allMatch(cellValue ->
-                                    cellValue.getValue() instanceof Date))
-                        type = Date.class;
-                    else if (Arrays.stream(dataPropertyColumn.getColumnData())
-                            .map(CellValue::getDouble)
-                            .allMatch(doubleValue -> doubleValue % 1 == 0))
-                        type = Integer.class;
-                    else
-                        type = Double.class;
-            }
-            else if(Arrays.stream(dataPropertyColumn.getColumnData())
-                            .filter(Objects::nonNull)
-                            .allMatch(cellValue ->
-                                    cellValue.getType() == CellType.BOOLEAN)) {
-                type = Boolean.class;
-            }
-            else if(Arrays.stream(dataPropertyColumn.getColumnData())
-                    .filter(Objects::nonNull)
-                    .allMatch(cellValue ->
-                            cellValue.getType() == CellType.STRING)){
-                type = String.class;
-            }
-
             CellValue[] dataProperties = dataPropertyColumn.getColumnData();
             String dataPropertyId = dataPropertyColumn.getHeader();
 
+            Class<?> type = Object.class;
+
             for (int rowId = 0; rowId < dataProperties.length; rowId++) {
-
-                if (dataProperties[rowId] == null || dataProperties[rowId].isNull())
-                    continue;
-
                 CellValue cellValue = dataProperties[rowId];
-                DataPropertyDTO dataProperty;
+                if (cellValue == null || cellValue.isNull()) continue;
 
-                if (type != Object.class) {
-                    dataProperty = new DataPropertyDTO(
-                            dataPropertyId,
-                            type.cast(cellValue.getValue()),
-                            type);
-                }
-                else {
-                    switch (cellValue.getType()) {
-                        case BOOLEAN -> dataProperty = new DataPropertyDTO(
-                                dataPropertyId,
-                                cellValue.getBoolean(),
-                                boolean.class
-                        );
-                        case NUMERIC -> {
-                            if (cellValue.isOfType(Date.class))
-                                dataProperty = new DataPropertyDTO(
-                                        dataPropertyId,
-                                        cellValue.getDate(),
-                                        Date.class
-                                );
-                            else if (cellValue.getDouble() % 1 == 0)
-                                dataProperty = new DataPropertyDTO(
-                                        dataPropertyId,
-                                        (int) cellValue.getValue(),
-                                        int.class
-                                );
-                            else
-                                dataProperty = new DataPropertyDTO(
-                                        dataPropertyId,
-                                        cellValue.getDouble(),
-                                        double.class
-                                );
-                        }
-                        case STRING -> dataProperty = new DataPropertyDTO(
-                                dataPropertyId,
-                                cellValue.getString(),
-                                String.class
-                        );
-                        default -> throw new RuntimeException(
-                                "Unexpected CellValue type when trying to initialize a data property");
-                    }
-                }
+                DataPropertyDTO dataProperty = DataPropertyDTOFactory.createDataProperty(
+                        dataPropertyId, cellValue, type
+                );
 
                 individuals.get(rowId).addDataProperty(dataProperty);
             }
@@ -354,58 +279,50 @@ public class OntologyDTOFactory {
 
     private void setObjectRelationships(List<IndividualDTO> individuals) {
 
-        if (!columnsToBuild.containsKey(ObjectPropertyColumn))
-            return;
+        if (!columnsToBuild.containsKey(ObjectPropertyColumn)) return;
 
-        columnsToBuild.get(ObjectPropertyColumn)
-            .forEach(objectPropertyColumn -> {
+        columnsToBuild.get(ObjectPropertyColumn).forEach(objectPropertyColumn -> {
+            var identifierColumnContainer = columnsToBuild.get(IdentifierColumn);
+            if (identifierColumnContainer != null)
+                addObjectProperties(individuals, identifierColumnContainer.getFirst(), objectPropertyColumn);
 
-                var identifierColumnContainer = columnsToBuild.get(IdentifierColumn);
-                if (identifierColumnContainer != null)
-                    addObjectProperties(identifierColumnContainer.getFirst(), objectPropertyColumn);
-
-                var labelColumnContainer = columnsToBuild.get(LabelColumn);
-                if (labelColumnContainer != null)
-                    addObjectProperties(labelColumnContainer.getFirst(), objectPropertyColumn);
-            });
+            var labelColumnContainer = columnsToBuild.get(LabelColumn);
+            if (labelColumnContainer != null)
+                addObjectProperties(individuals, labelColumnContainer.getFirst(), objectPropertyColumn);
+        });
     }
 
-    private void addObjectProperties(ColumnAnalyzer identifier, ColumnAnalyzer objectPropertyColumn) {
+    private void addObjectProperties(
+            List<IndividualDTO> individuals,
+            ColumnAnalyzer identifier,
+            ColumnAnalyzer objectPropertyColumn) {
 
         CellValue[] identifierColumnData = identifier.getColumnData();
         CellValue[] objPropColumnData = objectPropertyColumn.getColumnData();
         String objPropertyName = objectPropertyColumn.getHeader();
 
         for (int rowId = 0; rowId < identifierColumnData.length; rowId++) {
-
             CellValue subjectValue = identifierColumnData[rowId];
+            if (subjectValue == null || subjectValue.isNull()) continue;
 
-            IndividualDTO foundSubject = resources.stream()
-                    .filter(res -> res instanceof IndividualDTO)
-                    .map(res -> (IndividualDTO) res)
-                    .filter(ind -> Objects.equals(
-                            ind, new IndividualDTO(subjectValue.toString())))
-                    .findFirst()
-                    .orElse(null);
-
-            if (foundSubject == null)
-                break;
+            IndividualDTO foundSubject = findIndividual(individuals, subjectValue);
+            if (foundSubject == null) continue;
 
             CellValue objectValue = objPropColumnData[rowId];
+            if (objectValue == null || objectValue.isNull()) continue;
 
-            IndividualDTO foundObject = resources.stream()
-                    .filter(res -> res instanceof IndividualDTO)
-                    .map(res -> (IndividualDTO) res)
-                    .filter(ind -> Objects.equals(
-                            ind, new IndividualDTO(objectValue.toString())))
-                    .findFirst()
-                    .orElse(null);
-
-            if (foundObject == null)
-                continue;
+            IndividualDTO foundObject = findIndividual(individuals, objectValue);
+            if (foundObject == null) continue;
 
             foundSubject.addObjectProperty(new ObjectPropertyDTO(objPropertyName, foundObject));
         }
+    }
+
+    private IndividualDTO findIndividual(List<IndividualDTO> individuals, CellValue cellValue) {
+        return individuals.stream()
+                .filter(ind -> Objects.equals(ind, IndividualDTOFactory.createIndividual(cellValue)))
+                .findFirst()
+                .orElse(null);
     }
 
     public Map<? extends ClassDTO, ? extends ClassDTO> getClassBindingPairs() {

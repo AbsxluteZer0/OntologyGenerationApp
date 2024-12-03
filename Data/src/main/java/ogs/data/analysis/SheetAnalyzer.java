@@ -52,12 +52,10 @@ public class SheetAnalyzer implements ModelChangeListener {
     public void initialize() {
 
         sheetName = dataExtractor.getSheetName();
-
         CellValue[][] rowValues = dataExtractor.extractValues();
 
         // Remove null/blank rows
         rowValues = dataTransformer.filterEmptyArrays(rowValues);
-
         cellData = new CellData(rowValues);
 
         // Remove null/blank columns
@@ -138,7 +136,7 @@ public class SheetAnalyzer implements ModelChangeListener {
 
         for (int i = 0; i < headerRow.length; i++) {
 
-            TableAnalysisConcept concept = null;
+            TableAnalysisConcept concept;
             StringBuilder responseBuilder = new StringBuilder(10);
             CellValue header = headerRow[i];
             responseBuilder.append(header);
@@ -229,7 +227,7 @@ public class SheetAnalyzer implements ModelChangeListener {
             if (matches) {
                 column.setDefinition(LabelColumn);
                 column.setReason(String.format(
-                        "The non-null values of the column have uniqueness >= %.2f and are of type STRING.",
+                        "The non-null values of the column have uniqueness >= %s and are of type STRING.",
                         uniquenessThreshold));
                 break;
             }
@@ -353,14 +351,15 @@ public class SheetAnalyzer implements ModelChangeListener {
     private void defineObjectPropertyColumns() {
 
         ensureModelIsUpToDate();
+        defineObjectPropertyColumnsUsing(IdentifierColumn);
+        defineObjectPropertyColumnsUsing(LabelColumn);
+    }
 
-        ColumnAnalyzer identifierColumn = getColumnDefinedAs(IdentifierColumn);
+    private void defineObjectPropertyColumnsUsing(TableAnalysisConcept identifierConcept) {
 
-        if (identifierColumn == null)
-            identifierColumn = getColumnDefinedAs(LabelColumn);
+        ColumnAnalyzer identifierColumn = getColumnDefinedAs(identifierConcept);
 
-        if (identifierColumn == null)
-            return;
+        if (identifierColumn == null) return;
 
         List<String> identifierColumnValues = Arrays.stream(identifierColumn.getColumnData())
                 .filter(cellValue -> cellValue != null && !cellValue.isNull())
@@ -368,29 +367,27 @@ public class SheetAnalyzer implements ModelChangeListener {
                 .toList();
 
         for (var column : columns) {
-            
-            if (column.isDefined())
-                continue;
 
-            // Tokenized match threshold
-            int matchCountThreshold = 0;
+            if (column.isDefined()) continue;
+
             int columnSize = column.getColumnData().length;
+            int matchCount = 0;
+            int matchCountThreshold = columnSize / 2;
 
             for (CellValue cellValue : column.getColumnData()) {
 
-                if (cellValue == null || cellValue.isNull())
-                    continue;
+                if (cellValue == null || cellValue.isNull()) continue;
 
                 List<String> tokens = cellValue.getTokenizedValues().stream()
                         .map(String::strip)
-                        .toList();;
+                        .toList();
 
-                matchCountThreshold += (int) tokens.stream()
+                matchCount += (int) tokens.stream()
                         .filter(identifierColumnValues::contains)
                         .count();
 
                 // Break early if threshold is reached
-                if (matchCountThreshold >= columnSize / 2) {
+                if (matchCount >= matchCountThreshold) {
                     column.setDefinition(ObjectPropertyColumn);
                     column.setReason(String.format(
                             "At least half of the tokenized values of the column match values from %s '%s' with index %d.",
@@ -448,8 +445,7 @@ public class SheetAnalyzer implements ModelChangeListener {
 
     private void defineCommentColumn() {
 
-        if (anyColumnIsDefinedAs(CommentColumn))
-            return;
+        if (anyColumnIsDefinedAs(CommentColumn)) return;
 
         ensureModelIsUpToDate();
 
@@ -483,7 +479,7 @@ public class SheetAnalyzer implements ModelChangeListener {
             ));
         }
 
-        // Висока унікальність токенів?
+        // Also check for high token uniqueness?
     }
 
     private void defineTheRemainingColumns() {
@@ -570,15 +566,6 @@ public class SheetAnalyzer implements ModelChangeListener {
         return Arrays.stream(columns)
                 .filter(column -> column.isDefinedAs(definition))
                 .toArray(ColumnAnalyzer[]::new);
-    }
-
-    private static void visualizeDataNullStructure(CellValue[][] cellValues) {
-        for (CellValue[] cellValue : cellValues) {
-            for (CellValue value : cellValue) {
-                System.out.printf("%s\t", value == null || value.isNull() ? "null" : "value");
-            }
-            System.out.print('\n');
-        }
     }
 
     //endregion
