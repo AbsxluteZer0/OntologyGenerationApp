@@ -328,33 +328,7 @@ public class JenaOntologyManager {
     public void createAssociations(List<IndividualDTO> individualDTOs) {
 
         String associatesWithPropertyURI = COMPLETE_BASE_URI + "associatesWith";
-        //Property integratesWithProperty = model.getObjectProperty(COMPLETE_BASE_URI + "integratesWith");
         Property associatesWithProperty = model.getObjectProperty(associatesWithPropertyURI);
-
-        if (associatesWithProperty == null) {
-            associatesWithProperty = model.createObjectProperty(associatesWithPropertyURI);
-        }
-
-//        //integratesWith
-//        for (IndividualDTO individualDTO : individualDTOs) {
-//
-//            List<IndividualDTO> integratesWithList =
-//                    analyzeDescriptionForIntegrations(individualDTO.getComment("en"), individualDTOs);
-//
-//            if (integratesWithList.isEmpty())
-//                continue;
-//
-//            Individual thisIndividual = resolveIndividual(individualDTO);
-//
-//            if (thisIndividual == null)
-//                continue;
-//
-//            for (IndividualDTO integratesWithDTO : integratesWithList) {
-//
-//                Individual integratesWithIndividual = resolveIndividual(integratesWithDTO);
-//                thisIndividual.addProperty(integratesWithProperty, integratesWithIndividual);
-//            }
-//        }
 
         //associatesWith
         for (IndividualDTO individualDTO : individualDTOs) {
@@ -369,6 +343,10 @@ public class JenaOntologyManager {
 
             if (thisIndividual == null)
                 continue;
+
+            if (associatesWithProperty == null) {
+                associatesWithProperty = model.createObjectProperty(associatesWithPropertyURI);
+            }
 
             for (IndividualDTO associatesWithDTO : associatesWithList) {
 
@@ -465,8 +443,10 @@ public class JenaOntologyManager {
 
         String baseNamespace = generateBaseNamespacePrefix(fileBaseName);
 
-        model.setNsPrefix(baseNamespace, COMPLETE_BASE_URI);
-        System.out.printf("Base xmlns is set to: %s=\"%s\"%n", baseNamespace, model.getNsPrefixURI(baseNamespace));
+        if (model.getNsPrefixURI(baseNamespace) == null) {
+            model.setNsPrefix(baseNamespace, COMPLETE_BASE_URI);
+            System.out.printf("Base xmlns is set to: %s=\"%s\"%n", baseNamespace, model.getNsPrefixURI(baseNamespace));
+        }
     }
 
     private String resolveBaseURI() {
