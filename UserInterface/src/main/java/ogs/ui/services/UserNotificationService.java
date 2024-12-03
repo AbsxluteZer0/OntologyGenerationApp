@@ -25,12 +25,16 @@ public class UserNotificationService {
 
     public void info(String message) {
 
-        System.out.println(message + " (by UserNotificationService's info())");
+        System.out.println("INFO: " + message);
+
         Platform.runLater(() -> messageHost.setText(message));
         scheduler.schedule(() -> Platform.runLater(() -> messageHost.setText("")), 10, TimeUnit.SECONDS);
     }
 
     public void warning(String message) {
+
+        System.out.println("WARNING: " + message);
+
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.setTitle("Warning Dialog");
         alert.setHeaderText("Warning!");
@@ -40,6 +44,9 @@ public class UserNotificationService {
     }
 
     public void warning(String headerText, Exception ex) {
+
+        System.out.println("WARNING: " + headerText);
+
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.setTitle("Warning Dialog");
         alert.setHeaderText(headerText);
@@ -77,6 +84,9 @@ public class UserNotificationService {
     }
 
     public void error(String headerText, Exception ex) {
+
+        System.out.println("ERROR: " + headerText);
+
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Exception Dialog");
         alert.setHeaderText(headerText);
