@@ -26,7 +26,7 @@ public class OntologyDataProvider {
     public void extractData() {
 
         if (workbookAnalyzer == null)
-            throw new IllegalStateException("Call initialize first.");
+            throw new IllegalStateException("Call initialize() first.");
 
         workbookAnalyzer.analyzeMetadata();
 

@@ -52,7 +52,6 @@ public class SheetAnalyzer implements ModelChangeListener {
     public void initialize() {
 
         sheetName = dataExtractor.getSheetName();
-
         CellValue[][] rowValues = dataExtractor.extractValues();
 
         // Remove null/blank rows
@@ -138,7 +137,7 @@ public class SheetAnalyzer implements ModelChangeListener {
 
         for (int i = 0; i < headerRow.length; i++) {
 
-            TableAnalysisConcept concept = null;
+            TableAnalysisConcept concept;
             StringBuilder responseBuilder = new StringBuilder(10);
             CellValue header = headerRow[i];
             responseBuilder.append(header);
@@ -383,7 +382,7 @@ public class SheetAnalyzer implements ModelChangeListener {
 
                 List<String> tokens = cellValue.getTokenizedValues().stream()
                         .map(String::strip)
-                        .toList();;
+                        .toList();
 
                 matchCountThreshold += (int) tokens.stream()
                         .filter(identifierColumnValues::contains)
@@ -570,15 +569,6 @@ public class SheetAnalyzer implements ModelChangeListener {
         return Arrays.stream(columns)
                 .filter(column -> column.isDefinedAs(definition))
                 .toArray(ColumnAnalyzer[]::new);
-    }
-
-    private static void visualizeDataNullStructure(CellValue[][] cellValues) {
-        for (CellValue[] cellValue : cellValues) {
-            for (CellValue value : cellValue) {
-                System.out.printf("%s\t", value == null || value.isNull() ? "null" : "value");
-            }
-            System.out.print('\n');
-        }
     }
 
     //endregion

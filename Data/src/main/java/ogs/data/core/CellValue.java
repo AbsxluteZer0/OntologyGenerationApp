@@ -59,7 +59,16 @@ public class CellValue {
     private Object extractValue(Cell cell, CellType cellType) {
 
         return switch (cellType) {
-            case STRING -> cell.getStringCellValue();
+            case STRING -> {
+                var stringValue = cell.getStringCellValue();
+                if (stringValue == null || stringValue.isBlank()) {
+                    type = _NONE;
+                    yield null;
+                }
+                else {
+                    yield cell.getStringCellValue();
+                }
+            }
             case NUMERIC -> isCellDateFormatted(cell)
                     ? cell.getDateCellValue()
                     : cell.getNumericCellValue();
