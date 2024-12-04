@@ -111,12 +111,23 @@ public class JenaOntologyManager {
                 throw new IllegalArgumentException("Could not find OntClass for provided ClassDTOs");
             }
 
-            keyClass.listInstances().forEachRemaining(individual -> {
-                if (individual.isResource()) {
-                    individual.addRDFType(valueClass);
-                }
-            });
+            bindInstancesRecursively(keyClass, valueClass);
         }
+    }
+
+    private void bindInstancesRecursively(OntClass sourceClass, OntClass targetClass) {
+
+        sourceClass.listInstances().forEachRemaining(individual -> {
+            if (individual.isResource()) {
+                individual.addRDFType(targetClass);
+            }
+        });
+
+        sourceClass.listSubClasses(true).forEachRemaining(subClass -> {
+            if (subClass.canAs(OntClass.class)) {
+                bindInstancesRecursively(subClass.as(OntClass.class), targetClass);
+            }
+        });
     }
 
     public void save() throws IOException { OntologyFileIO.saveTo(model, FILE_PATH); }
