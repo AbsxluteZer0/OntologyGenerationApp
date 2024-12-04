@@ -173,13 +173,13 @@ public class JenaOntologyManager {
 
         OntProperty ontProperty = switch (propertyDTO) {
             case DataPropertyDTO dataPropertyDTO ->
-                    model.createDatatypeProperty(resolveURIFor(propertyDTO));
+                    model.createDatatypeProperty(resolveURIFor(dataPropertyDTO));
 
             case ObjectPropertyDTO objectPropertyDTO ->
-                    model.createObjectProperty(resolveURIFor(propertyDTO));
+                    model.createObjectProperty(resolveURIFor(objectPropertyDTO));
 
             case AnnotationPropertyDTO annotationPropertyDTO ->
-                    model.createAnnotationProperty(resolveURIFor(propertyDTO));
+                    model.createAnnotationProperty(resolveURIFor(annotationPropertyDTO));
 
             case null ->
                 throw new NullPointerException("PropertyDTO is null! Check the value before passing it here!");
@@ -508,16 +508,5 @@ public class JenaOntologyManager {
 
     private String resolveURIFor(ResourceDTO resourceDTO) {
         return COMPLETE_BASE_URI + resourceDTO.getId();
-    }
-
-    public void addDataPropertiesByNames(List<String> dataPropertyNames) {
-
-        for (String dataPropertyName : dataPropertyNames) {
-            model.createDatatypeProperty(COMPLETE_BASE_URI + dataPropertyName);
-        }
-    }
-
-    private boolean isNotNullOrBlank(String str) {
-        return str != null && !str.isBlank();
     }
 }
